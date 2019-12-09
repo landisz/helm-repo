@@ -1,0 +1,36 @@
+apiVersion: v1
+entries:
+  core-services:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2019-12-09T11:28:42.410717491Z"
+    dependencies:
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: ""
+    - condition: pcrf.enabled
+      name: pcrf
+      repository: ""
+    - condition: hss.enabled
+      name: hss
+      repository: ""
+    - condition: pgw.enabled
+      name: pgw
+      repository: ""
+    - condition: sgw.enabled
+      name: sgw
+      repository: ""
+    - condition: mme.enabled
+      name: mme
+      repository: ""
+    - condition: ueWeb.enabled
+      name: ueWeb
+      repository: ""
+    description: A Helm chart for Kubernetes
+    digest: 172259ad2fb754cf7ce420440b258cdbe5ef8e6d865be99f6dfc47f4156633ad
+    name: core-services
+    type: application
+    urls:
+    - https://github.com/landisz/helm-repo/core-services-0.1.0.tgz
+    version: 0.1.0
+generated: "2019-12-09T11:28:42.408835893Z"
