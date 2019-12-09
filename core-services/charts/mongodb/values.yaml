@@ -1,0 +1,42 @@
+# Default values for mongodb.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# Default values for core4g-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+#       Author: L.Zhu
+#       Contact: l.zhu@surrey.ac.uk
+#       Date: Sep 2019
+
+#replicaCount: 1
+#replicaCountMongo: 1
+database:
+  replica: 2
+  repository: {}
+  mongo:
+    replica: 2
+    sevice:
+      name: "mongodb-service"
+      port: 27017
+      label: mongo
+      role: mongo
+    image: 
+      database: mongo
+      sidecar: cvallance/mongo-k8s-sidecar
+    tag: {}
+    pv:
+      name: mongopv
+      size: 5Gi
+      subPath: mongodb/
+      accessModes: ReadWriteOnce
+      storageClass:
+        name: mongo-storage
+        provisioner: kubernetes.io/no-provisioner
+        bindingMode: WaitForFirstConsumer
+    pvc:
+      name: mongopv-claim
+      size: 5Gi
+  mariadb: {}
+persistentVolume:
+  enabled: true
+  mountPath: /5GIC-core-data/

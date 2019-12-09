@@ -1,0 +1,78 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.gtpc.name }}
+spec:
+  selector:
+    app: sgw-deployment
+  ports:
+    - name: gtpc-port
+      protocol: "UDP"
+      # Port accessible inside cluster
+      port: 2123
+      # Port to forward to inside the pod
+      targetPort: 2123
+      # Port accessible outside cluster
+  type: NodePort 
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.gtpu.name }}
+spec:
+  selector:
+    app: sgw-deployment
+  ports:
+#      nodePort: 2123
+    - name: gtpu-port
+      protocol: "UDP"
+      # Port accessible inside cluster
+      port: 32152
+      # Port to forward to inside the pod
+      targetPort: 2152
+      nodePort: 2152
+#  externalIPs: ["10.5.24.253"]
+  type: LoadBalancer
+  #  externalIPs:
+  # - 10.5.25.31
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.deployment.name }}
+spec:
+  selector:
+    matchLabels:
+      app: sgw-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sgw-deployment
+    spec:
+      containers:
+        - name: sgw-pod
+          image: {{ .Values.global.coreImage }}:{{ .Values.global.coreTag }}
+          env:
+            - name: PCRF_HOSTNAME
+              value: {{ .Release.Name }}-{{ .Values.global.service.pcrf }}
+            - name: SGW_ADDR
+              value: {{ .Release.Name }}-{{ .Values.service.gtpc.name }}
+            - name: S1U_ADDR
+              value: {{ .Values.global.addr.externalIP }}
+            - name: LD_LIBRARY_PATH
+              value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
+          command: [ "/usr/bin/sgw.sh" ]
+          ports:
+            - name: gtpc-port
+              containerPort: 2123
+            - name: gtpu-port
+              containerPort: 2152
+      imagePullSecrets:
+        - name: {{ .Values.global.coreDockerSecret }}
+      initContainers:
+      - name: wait-for-pcrf
+        image: busybox
+        command: ["sh", "-c", "sleep 10; until nslookup {{ .Release.Name }}-{{ .Values.global.service.pcrf }}; do echo waiting for pcrf; sleep 2; done;"]
+

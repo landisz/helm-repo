@@ -1,0 +1,30 @@
+######################################################
+#       Author: L.Zhu
+#       Contact: l.zhu@surrey.ac.uk
+#       Date: Sep 2019
+######################################################
+
+
+{{ if .Values.persistentVolume.enabled }}
+{{- $root := . -}}
+{{ range $i, $e := until (int $root.Values.database.replica) }}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $root.Values.database.mongo.pv.name }}-{{ $i }}
+  labels:
+    type: local
+spec:
+  storageClassName: {{ $root.Values.database.mongo.pv.storageClass.name }}
+  capacity:
+    storage: {{ $root.Values.database.mongo.pv.size }}
+  volumeMode: Filesystem
+  accessModes:
+    -  {{ $root.Values.database.mongo.pv.accessModes }}
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: {{ $root.Values.persistentVolume.mountPath }}{{ $root.Values.database.mongo.pv.subPath }}{{ $root.Values.database.mongo.pv.name }}-{{ $i }}
+{{ end }}
+{{ end }}

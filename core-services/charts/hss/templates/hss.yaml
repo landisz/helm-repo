@@ -1,0 +1,58 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.name }}
+spec:
+  selector:
+    app: hss-deployment
+  ports:
+#      nodePort: 2123
+    - name: hss-port
+      protocol: "TCP"
+      # Port accessible inside cluster
+      port: 3868
+      # Port to forward to inside the pod
+      targetPort: 3868
+      # Port accessible outside cluster
+#      nodePort:
+#  externalIPs: ["10.5.24.253"]
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.deployment.name }}
+spec:
+  selector:
+    matchLabels:
+      app: hss-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hss-deployment
+    spec:
+      containers:
+        - name: hss-pod
+          image: {{ .Values.global.coreImage }}:{{ .Values.global.coreTag }}
+          env:
+            - name: MONGODB_HOSTNAME
+              value: {{ .Release.Name }}-mongodb-service
+            - name: PGW_HOSTNAME
+              value: "pgw-diameter-service"
+            - name: LD_LIBRARY_PATH
+              value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
+          command: [ "/usr/bin/hss.sh" ]
+#          command: [ "/bin/ping","10.5.2`4.28" ]
+          ports:
+            - name: hss-port
+              containerPort: 3868
+      imagePullSecrets:
+      - name: {{ .Values.global.coreDockerSecret }}  
+      initContainers:
+      - name: wait-for-mongodb
+        image: busybox
+        command: ["sh", "-c", "until nslookup {{ .Release.Name }}-mongodb-service; do echo waiting for mongodb; sleep 2; done;"]
+

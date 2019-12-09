@@ -1,0 +1,117 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.gtpc.name }}
+spec:
+  selector:
+    app: mme-deployment
+  ports:
+    - name: gtpc-port
+      protocol: "UDP"
+      # Port accessible inside cluster
+      port: 2123
+      # Port to forward to inside the pod
+      targetPort: 2123
+      # Port accessible outside cluster
+#      nodePort: 2123
+#  externalIPs: ["10.5.24.253"]
+  type: NodePort 
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.s1ap.name }}
+spec:
+  selector:
+    app: mme-deployment
+  ports:
+#      nodePort: 2123
+    - name: s1ap-port
+      protocol: "SCTP"
+      # Port accessible inside cluster
+      port: 36412
+      # Port to forward to inside the pod
+      targetPort: 36412
+      # Port accessible outside cluster
+      nodePort: 36412
+#  externalIPs: ["10.5.24.253"]
+  type: LoadBalancer
+  #  externalIPs:
+  # - 10.5.24.29
+    #  type: NodePort
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.diameter.name }}
+spec:
+  selector:
+    app: mme-deployment
+  ports:
+#      nodePort: 2123
+    - name: diameter-port
+      protocol: "TCP"
+      # Port accessible inside cluster
+      port: 3868
+      # Port to forward to inside the pod
+      targetPort: 3868
+      # Port accessible outside cluster
+#      nodePort: 5868
+#  externalIPs: ["10.5.24.253"]
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.deployment.name }}
+spec:
+  selector:
+    matchLabels:
+      app: mme-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mme-deployment
+    spec:
+      containers:
+        - name: mme-pod
+          image: {{ .Values.global.coreImage }}:{{ .Values.global.coreTag }}
+          env:
+            - name: HSS_HOSTNAME
+              value: {{ .Release.Name }}-{{ .Values.global.service.hss }}
+            - name: MCC
+              value: "235"
+            - name: MNC
+              value: "91"
+            - name: TAC_LIST
+              value: "5050,5100"
+            - name: SGW_HOSTNAME
+              value: {{ .Release.Name }}-{{ .Values.global.service.sgwGtpc }}
+            - name: PGW_HOSTNAME
+              value: {{ .Release.Name }}-{{ .Values.global.service.pgwGtpc }}
+            - name: FULL_NETWORK_NAME
+              value: "5GIC"
+            - name: LD_LIBRARY_PATH
+              value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
+#              value: "/usr/lib/x86_64-linux-gnu/"
+          command: [ "/usr/bin/mme.sh" ]
+          #          command: [ "/bin/ping","10.5.24.29" ]
+          ports:
+            - name: gtpc-port
+              containerPort: 2123
+            - name: s1ap-port
+              protocol: "SCTP"
+              containerPort: 36412
+            - name: diameter-port
+              containerPort: 3868
+      imagePullSecrets:
+        - name: {{ .Values.global.coreDockerSecret }}
+      initContainers:
+      - name: wait-for-hss
+        image: busybox
+        command: ["sh", "-c", "sleep 15; until nslookup {{ .Release.Name }}-{{ .Values.global.service.hss }}; do echo waiting for hss; sleep 2; done;"]
+
+
