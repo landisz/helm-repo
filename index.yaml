@@ -3,7 +3,7 @@ entries:
   core-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2019-12-09T13:25:19.995025453Z"
+    created: "2019-12-10T12:46:04.880687888Z"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -31,6 +31,27 @@ entries:
     name: core-services
     type: application
     urls:
-    - https://landisz.github.com/helm-repo/core-services-0.1.0.tgz
+    - https://landisz.github.io/helm-repo/docs/core-services-0.1.0.tgz
     version: 0.1.0
-generated: "2019-12-09T13:25:19.992406933Z"
+  pcrf:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2019-12-10T12:46:04.875779842Z"
+    description: A Helm chart for Kubernetes
+    digest: 4e09ec19543e5b3dd3bb1391a8bb713d89057c10837b9ca86c794e39817aca1e
+    name: pcrf
+    type: application
+    urls:
+    - https://landisz.github.io/helm-repo/pcrf-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2019-12-10T12:46:04.881100422Z"
+    description: A Helm chart for Kubernetes
+    digest: 4e09ec19543e5b3dd3bb1391a8bb713d89057c10837b9ca86c794e39817aca1e
+    name: pcrf
+    type: application
+    urls:
+    - https://landisz.github.io/helm-repo/docs/pcrf-0.1.0.tgz
+    version: 0.1.0
+generated: "2019-12-10T12:46:04.875447713Z"

@@ -1,0 +1,22 @@
+# Default values for pcrf.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  coreImage: "robjspencer/core"
+  coreTag: "latest"
+  coreDockerSecret: core-docker-secret
+  service:
+    pcrf: 4g-pcrf-svc
+    hss: 4g-hss-svc
+    sgwGtpc: 4g-sgw-gtpc-svc
+    pgwGtpc: 4g-pgw-gtpc-svc
+    mongodb: mongodb-service
+  addr:
+    externalIP: "10.5.24.222"
+replicaCount: 1
+service:
+  name: 4g-pcrf-svc
+deployment:
+  name: 4g-pcrf
+replicaCount: 1
+
