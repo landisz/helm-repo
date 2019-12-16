@@ -1,0 +1,104 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.gtpc.name }}
+spec:
+  selector:
+    app: pgw-deployment
+  ports:
+    - name: gtpc-port
+      protocol: "UDP"
+      # Port accessible inside cluster
+      port: 2123
+      # Port to forward to inside the pod
+      targetPort: 2123
+      # Port accessible outside cluster
+#      nodePort: 2123
+#  externalIPs: ["10.5.24.253"]
+  type: NodePort 
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.gtpu.name }}
+spec:
+  selector:
+    app: pgw-deployment
+  ports:
+#      nodePort: 2123
+    - name: gtpu-port
+      protocol: "UDP"
+      # Port accessible inside cluster
+      port: 2152
+      # Port to forward to inside the pod
+      targetPort: 2152
+      # Port accessible outside cluster
+#      nodePort: 36412
+#  externalIPs: ["10.5.24.253"]
+  type: NodePort
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.diameter.name }}
+spec:
+  selector:
+    app: pgw-deployment
+  ports:
+#      nodePort: 2123
+    - name: diameter-port
+      protocol: "TCP"
+      # Port accessible inside cluster
+      port: 3868
+      # Port to forward to inside the pod
+      targetPort: 3868
+      # Port accessible outside cluster
+#      nodePort: 5868
+#  externalIPs: ["10.5.24.253"]
+  type: NodePort
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.deployment.name }}
+spec:
+  selector:
+    matchLabels:
+      app: pgw-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pgw-deployment
+    spec:
+      containers:
+        - name: pgw-pod
+          image:  {{ .Values.global.coreImage }}:{{ .Values.global.coreTag }}
+          env:
+            - name: PCRF_HOSTNAME
+              value: {{ .Release.Name }}-{{ .Values.global.service.pcrf }}
+            - name: UE_POOL_SUBNET
+              value: "10.10.0.1/16"
+            - name: LD_LIBRARY_PATH
+              value: "/usr/lib/x86_64-linux-gnu/5giccore/freeDiameter"
+          command: [ "/usr/bin/pgw.sh" ]
+          ports:
+            - name: gtpc-port
+              containerPort: 2123
+            - name: gtpu-port
+              containerPort: 2152
+            - name: diameter-port
+              containerPort: 3868
+          securityContext:
+            privileged: true   
+      imagePullSecrets:
+        - name: {{ .Values.global.coreDockerSecret }}
+      initContainers:
+      - name: wait-for-pcrf
+        image: busybox
+        command: ["sh", "-c", "sleep 10; until nslookup {{ .Release.Name }}-{{ .Values.global.service.pcrf }}; do echo waiting for pcrf; sleep 2; done;"]
+
+

@@ -1,0 +1,97 @@
+# Default values for core-services.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+mongodb:
+  enabled: true
+pcrf:
+  enabled: false
+sgw:
+  enabled: false
+pgw:
+  enabled: false
+hss:
+  enabled: false
+mme:
+  enabled: false
+ueWeb:
+  enabled: false
+
+coreService:
+  dockerInfo:
+    user: robjspencer
+    passwd: uos.uos
+  k8sInfo:
+    namespace: default
+    dockerSecret: core-docker-secret 
+  repository: robjspencer
+  image: core
+  tag: latest
+  pullPolicy: Always
+global:
+  coreImage: "robjspencer/core"
+  coreTag: "latest"
+  coreDockerSecret: core-docker-secret
+  service:
+    pcrf: 4g-pcrf-svc
+    hss: 4g-hss-svc
+    sgwGtpc: 4g-sgw-gtpc-svc
+    pgwGtpc: 4g-pgw-gtpc-svc
+    mongodb: mongodb-service
+  addr:
+    externalIP: "10.5.24.222"
+replicaCount: 1
+
+#subcharts overriding
+#{{/* Try to use Release.Name */}}
+#{{- define "core-services.prefix" -}}
+#{{- printf "%s" .Release.Name -}}
+#{{- end -}}
+#mongodb:
+#  service:
+#    name: mongodb-service
+pcrf:
+  service: 
+    name: 4g-pcrf-svc
+  deployment:
+    name: 4g-pcrf
+hss:
+  service:
+    name: 4g-hss-svc
+  deployment:
+    name: 4g-hss
+sgw:
+  service:
+    gtpc:      
+      name: 4g-sgw-gtpc-svc
+    gtpu:      
+      name: 4g-sgw-gtpu-svc
+  deployment:
+    name: 4g-sgw
+pgw:
+  service:
+    gtpc:      
+      name: 4g-pgw-gtpc-svc
+    gtpu:      
+      name: 4g-pgw-gtpu-svc
+    diameter:      
+      name: 4g-pgw-diameter-svc
+  deployment:
+    name: 4g-pgw
+mme:
+  service:
+    gtpc:
+      name: 4g-mme-gtpc-svc
+    s1ap:
+      name: 4g-mme-s1ap-svc
+    diameter:
+      name: 4g-mme-diameter-svc
+  deployment:
+    name: 4g-mme
+ueWeb: 
+  service:
+    name: 4g-ueweb-svc
+  deployment:
+    name: 4g-ueweb
+
+
+

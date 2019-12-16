@@ -1,0 +1,15 @@
+dependencies:
+- name: mongodb
+  condition: mongodb.enabled
+- name: pcrf
+  condition: pcrf.enabled
+- name: hss
+  condition: hss.enabled
+- name: pgw
+  condition: pgw.enabled
+- name: sgw
+  condition: sgw.enabled
+- name: mme
+  condition: mme.enabled
+- name: ueWeb
+  condition: ueWeb.enabled

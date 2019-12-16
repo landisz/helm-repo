@@ -1,0 +1,20 @@
+# Default values for pcrf.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+coreService:
+  dockerInfo:
+    user: robjspencer
+    passwd: []
+  k8sInfo:
+    namespace: default
+    dockerSecret: core-docker-secret
+  repository: robjspencer
+  image: core
+  tag: latest
+  pullPolicy: Always
+
+replicaCount: 1
+#service:
+#  name: 4G-pcrf-svc
+#deployment:
+#  name: 4G-pcrf

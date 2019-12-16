@@ -1,0 +1,56 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.service.name }}
+spec:
+  selector:
+    app: webui-deployment
+  ports:
+#      nodePort: 2123
+    - name: webui-port
+      protocol: "TCP"
+      # Port accessible inside cluster
+      port: 3000
+      # Port to forward to inside the pod
+      targetPort: 3000
+      # Port accessible outside cluster
+      nodePort: 33030
+#  externalIPs: ["10.5.24.253"]
+  type: LoadBalancer
+  #  externalIPs:
+  #- 10.5.24.29
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.deployment.name }}
+spec:
+  selector:
+    matchLabels:
+      app: webui-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: webui-deployment
+    spec:
+      containers:
+        - name: webui-pod
+          image: {{ .Values.global.coreImage }}:webui
+          env:
+            - name: MONGODB_HOSTNAME
+              value: {{ .Release.Name }}-{{ .Values.global.service.mongodb }}
+            - name: DB_URI
+              value: mongodb://$(MONGODB_HOSTNAME)/5giccore?replicaSet=rs0
+          command: [ "sh", "-c", "npm run dev" ]
+          ports:
+            - name: webui-port
+              containerPort: 3000
+      imagePullSecrets:
+        - name: {{ .Values.global.coreDockerSecret }}
+      initContainers:
+      - name: wait-for-mongodb
+        image: busybox
+        command: ["sh", "-c", "until nslookup {{ .Release.Name }}-{{ .Values.global.service.mongodb }}; do echo waiting for mongodb; sleep 2; done;"]
+

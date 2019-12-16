@@ -3,45 +3,31 @@ entries:
   core-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2019-12-10T12:46:22.95269436Z"
-    dependencies:
-    - condition: mongodb.enabled
-      name: mongodb
-      repository: ""
-    - condition: pcrf.enabled
-      name: pcrf
-      repository: ""
-    - condition: hss.enabled
-      name: hss
-      repository: ""
-    - condition: pgw.enabled
-      name: pgw
-      repository: ""
-    - condition: sgw.enabled
-      name: sgw
-      repository: ""
-    - condition: mme.enabled
-      name: mme
-      repository: ""
-    - condition: ueWeb.enabled
-      name: ueWeb
-      repository: ""
+    created: 2019-12-16T12:50:42.714952619Z
     description: A Helm chart for Kubernetes
     digest: 09af5319a376170b3c47f90136784e2f5f7df8082aba526c5ebdfb94fc0b87a3
     name: core-services
-    type: application
     urls:
     - https://landisz.github.io/helm-repo/docs/core-services-0.1.0.tgz
+    version: 0.1.0
+  core-services-1.15:
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: 2019-12-16T12:50:42.715632084Z
+    description: A Helm chart for Kubernetes
+    digest: ca42a3e1480ef329954480b59f113b177189273ec0884ef0ca0d9586f3d22236
+    name: core-services-1.15
+    urls:
+    - https://landisz.github.io/helm-repo/docs/core-services-1.15-0.1.0.tgz
     version: 0.1.0
   pcrf:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2019-12-10T12:46:22.952896883Z"
+    created: 2019-12-16T12:50:42.715794832Z
     description: A Helm chart for Kubernetes
     digest: 4e09ec19543e5b3dd3bb1391a8bb713d89057c10837b9ca86c794e39817aca1e
     name: pcrf
-    type: application
     urls:
     - https://landisz.github.io/helm-repo/docs/pcrf-0.1.0.tgz
     version: 0.1.0
-generated: "2019-12-10T12:46:22.950135216Z"
+generated: 2019-12-16T12:50:42.706220976Z
